@@ -2,10 +2,52 @@
 
   const BinaryFile = require('binary-file');
   let crc = require('crc/crc16kermit');
-  const { exit } = require('process');
+  const { exit, send } = require('process');
+  const https = require('https')
 
   
   const myBinaryFile = new BinaryFile('C://Users//jose_//Desktop//test.fa5c', 'r', true);
+
+  function post_traccar_command(commandName, datos) {
+
+    const data = JSON.stringify({
+      id: 0,
+      deviceId: 133,
+      description: commandName,
+      type: "custom",
+      attributes: { 
+        "data": datos
+      }
+    })
+
+    const options = {
+      hostname: 'gps.tecka.mx',
+      port: 443,
+      path: '/api/commands/send',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length,
+        'Authorization': 'Basic YWRtaW46Um9uaU1AbjA3aGE3N2Fu'
+      }
+    }
+
+    const req = https.request(options, res => {
+      console.log(`statusCode: ${res.statusCode}`)
+    
+      res.on('data', d => {
+        process.stdout.write(d)
+      })
+    })
+    
+    req.on('error', error => {
+      console.error(error)
+    })
+    
+    req.write(data)
+    req.end()
+
+  }
   
   function ascii_to_hexa(str) {
 	  var arr1 = [];
@@ -15,6 +57,14 @@
 	  }
 	
     return arr1;
+  }
+
+  const keypress = async () => {
+    process.stdin.setRawMode(true)
+    return new Promise(resolve => process.stdin.once('data', () => {
+      process.stdin.setRawMode(false)
+      resolve()
+    }))
   }
 
   /**
@@ -57,11 +107,15 @@
   
   async function readConfigurationFile() {
     try {
-
+      var buffer = [];
+      var packs = 1;
       // #cfg_start@
       console.log("#cfg_start@");
-      build_message('#cfg_start@', []).forEach( element => process.stdout.write( ( '00' + element.toString(16).toUpperCase()).slice(-2)  ) );
-      console.log();
+      build_message('#cfg_start@', []).forEach( element => buffer.push( ( '00' + element.toString(16).toUpperCase()).slice(-2) ) );
+      post_traccar_command('Start', buffer.join(''));
+      console.log(); 
+
+      await keypress();
 
       await myBinaryFile.open();
       //console.log('File opened');
@@ -78,6 +132,10 @@
         const packetID = await myBinaryFile.readUInt8();
         payload.push( ('00' + packetID).slice(-2) );
         //console.log(`Packet ID: ${packetID}`);
+
+        if ( packetID > packs ) {
+          break;
+        }
 
         const paramsCount = await myBinaryFile.readUInt16();
         payload.push( paramsCount & 0x00ff );
@@ -103,26 +161,30 @@
         }
 
         //console.log( payload );
-
+        buffer = [];
         console.log("#cfg_send@" + packetID );
-        build_message('#cfg_send@', payload).forEach( element => process.stdout.write( ( '00' + element.toString(16).toUpperCase()).slice(-2)  ) );
-        console.log("");
-        console.log("");
+        build_message('#cfg_send@', payload).forEach( element => buffer.push( ( '00' + element.toString(16).toUpperCase()).slice(-2)  ) );
+        post_traccar_command('Send', buffer.join(''));
+        console.log(); 
 
-        
+        await keypress();
         // if @cfg_sts#<0x31> <0x01> <0x0D><0x0A>
 
       }
 
       console.log("#cfg_write@" );
-      build_message('#cfg_write@', []).forEach( element => process.stdout.write( ( '00' + element.toString(16).toUpperCase()).slice(-2)  ) );
-      console.log("");
-      console.log("");
+      buffer = [];
+      build_message('#cfg_write@', []).forEach( element => buffer.push( ( '00' + element.toString(16).toUpperCase()).slice(-2)  ) );
+      post_traccar_command('Write', buffer.join(''));
+      console.log(); 
+      await keypress();
 
       console.log("#cfg_end@"  );
-      build_message('#cfg_end@', []).forEach( element => process.stdout.write( ( '00' + element.toString(16).toUpperCase()).slice(-2)  ) );
-      console.log("");
-      console.log("");
+      buffer = [];
+      build_message('#cfg_end@', []).forEach( element => buffer.push( ( '00' + element.toString(16).toUpperCase()).slice(-2)  ) );
+      post_traccar_command('End', buffer.join(''));
+      console.log(); 
+      await keypress();
      
      
 
@@ -135,4 +197,7 @@
   }
 
   
+
+  //post_traccar_command("GetVersion", "00016717b9");
+
   readConfigurationFile()
