@@ -1,0 +1,24 @@
+{
+  "name": "ruptela_parser",
+  "version": "1.0.0",
+  "description": "Ruptela Parser for config file from command center",
+  "main": "parser.js",
+  "dependencies": {
+    "binary-file": "^0.2.3",
+    "crc": "^4.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matlock08/ruptela_parser.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matlock08/ruptela_parser/issues"
+  },
+  "homepage": "https://github.com/matlock08/ruptela_parser#readme"
+}
