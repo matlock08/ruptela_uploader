@@ -1,24 +1,21 @@
 {
-  "name": "ruptela_parser",
+  "name": "ruptelaParser",
   "version": "1.0.0",
-  "description": "Ruptela Parser for config file from command center",
-  "main": "parser.js",
+  "description": "",
+  "main": "server.js",
+  "keywords": [],
+  "author": "Jose Castellanos Molina",
+  "license": "ISC",
   "dependencies": {
     "binary-file": "^0.2.3",
-    "crc": "^4.1.0"
+    "body-parser": "^1.19.1",
+    "config": "^3.3.7",
+    "crc": "^4.1.0",
+    "express": "^4.17.2",
+    "multer": "^1.4.4",
+    "request": "^2.65.0"
   },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/matlock08/ruptela_parser.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/matlock08/ruptela_parser/issues"
-  },
-  "homepage": "https://github.com/matlock08/ruptela_parser#readme"
+  "devDependencies": {
+    "log4js": "^6.4.1"
+  }
 }
