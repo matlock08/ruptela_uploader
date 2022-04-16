@@ -45,11 +45,22 @@ local_upload_dir is the local directory used by ruptela uploader to hold the fil
 
 First you need to install node js 10.x as well as the dependencies with npm install, once you have dependencies run with traditional npm start
 
+## How to upload configuration
+
+You need to send a POST request with the device id from traccar in the field device as well as the file exported from Ruptela as fp4c.
+
+The uploader will read the file and split it on packages and send one by one to the device via traccar using the API.
+
+```
+curl -F "device=3" -F "file=@/home/user/configuration.fp4c" https://your.domain/configuration
+```
+
+
 ## Pending Work
 
 The current implementation allows to upload configuration, and even when downloading is possible , we need to implement a change on traccar as currently 
 the commandResult is exposed as string, and the hexadecimal values got lost, so we might need to change traccar code to allow us to read the values in result as hexadecimals and not strings.
 
- [X] Upload configuration
- [ ] Download current config
+[X] Upload configuration
+[ ] Download current config
 
